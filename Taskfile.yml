@@ -1,0 +1,14 @@
+version: '3'
+
+tasks:
+  publish:
+    cmds:
+      - powershell Remove-Item -Recurse -Force dist
+      - poetry version patch
+      - poetry run python -m build
+      - poetry run twine upload --repository pypi dist/*
+      - git add .
+      - git commit -m "Bump version to $(poetry version -s)"
+      - poetry run python -c "import os; version = os.popen('poetry version -s').read().strip(); os.system(f'git tag v{version}')"
+      - git push origin --tags
+    desc: "Publish the project and create a Git tag" 
